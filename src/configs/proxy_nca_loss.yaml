@@ -1,0 +1,18 @@
+{
+    # Learning rate
+    "lr": 0.001,
+    # Size of images to be resized before training
+    "image_size": 448,
+    # Size of output embedding vector
+    "embedding_size": 128,
+    # Batch size
+    "batch_size": 48,
+    # Factor for smoothing labels
+    "smoothing_factor": 0.1,
+    # Multiply embeddings with this number
+    "embedding_scale": 1.0,
+    # Multiply proxies with this number
+    "proxy_scale": 3.0,
+    # Whether to use pretrained weight on ImageNet or not
+    "pretrained": True,
+}
