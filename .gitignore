@@ -114,6 +114,12 @@ venv.bak/
 .spyderproject
 .spyproject
 
+# Vscode settings
+.vscode
+
+# PyCharm settings
+.idea
+
 # Rope project settings
 .ropeproject
 
@@ -127,3 +133,8 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Model's weight
+*.pt
+*.pth
+*.ckpt
