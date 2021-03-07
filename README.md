@@ -1,6 +1,10 @@
 
 <div align="center">
-    <h1>Tsinghua Dogs classification with Deep Metric Learning</h1>
+    <h1>
+    Tsinghua Dogs classification with
+    <br>
+    Deep Metric Learning
+    </h1>
 </div>
 
 
@@ -117,7 +121,41 @@ pip install opencv-python tensorboard torch-summary torch_optimizer scikit-learn
 ```sh
 python src/scripts/prepare_TsinghuaDogs.py --output_dir data/
 ```
-## 4.3 Train model with different losses and configs
+
+Directory `data` should be like this:
+```sh
+data/
+└── TsinghuaDogs
+    ├── High-Annotations
+    ├── high-resolution
+    ├── TrainAndValList
+    ├── train
+    │   ├── 561-n000127-miniature_pinscher
+    │   │   ├── n107028.jpg
+    │   │   ├── n107031.jpg
+    │   │   ├── ...
+    │   │   └── n107218.jp
+    │   ├── ...
+    │   ├── 806-n000129-papillon
+    │   │   ├── n107440.jpg
+    │   │   ├── n107451.jpg
+    │   │   ├── ...
+    │   │   └── n108042.jpg
+    └── val
+        ├── 561-n000127-miniature_pinscher
+        │   ├── n161176.jpg
+        │   ├── n161177.jpg
+        │   ├── ...
+        │   └── n161702.jpe
+        ├── ...
+        └── 806-n000129-papillon
+            ├── n169982.jpg
+            ├── n170022.jpg
+            ├── ...
+            └── n170736.jpeg
+
+```
+## 4.3 Train model
 
 - Train with proxy-nca loss
 ```sh
@@ -141,7 +179,7 @@ If you encounter out of memory issues, try reducing `classes_per_batch` and `sam
 
 
 # 5. Evaluate
-To evaluate model, directory `data` should be structured like this:
+To evaluate, directory `data` should be structured like this:
 ```sh
 data/
 └── TsinghuaDogs
@@ -169,7 +207,6 @@ data/
             ├── n170022.jpg
             ├── ...
             └── n170736.jpeg
-
 
 ```
 
