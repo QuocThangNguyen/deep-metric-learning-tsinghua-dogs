@@ -114,12 +114,12 @@ conda install -n dml pytorch torchvision cudatoolkit=10.2 -c pytorch
 conda install -n dml faiss-gpu cudatoolkit=10.2 -c pytorch
 
 # Install other dependencies
-pip install opencv-python tensorboard torch-summary torch_optimizer scikit-learn matplotlib seaborn requests pprint ipdb
+pip install opencv-python tensorboard torch-summary torch_optimizer scikit-learn matplotlib seaborn requests ipdb flake8 pyyaml
 ```
 
 ## 4.2 Prepare Tsinghua Dogs dataset
 ```sh
-python src/scripts/prepare_TsinghuaDogs.py --output_dir data/
+PYTHONPATH=./ python src/scripts/prepare_TsinghuaDogs.py --output_dir data/
 ```
 
 Directory `data` should be like this:
