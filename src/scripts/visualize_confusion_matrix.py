@@ -13,6 +13,7 @@ import os
 from pprint import pformat
 import logging
 import time
+from multiprocessing import cpu_count
 import sys
 from typing import List, Dict, Any
 
@@ -174,7 +175,7 @@ if __name__ == "__main__":
         help="Path to model's checkpoint."
     )
     parser.add_argument(
-        "--k_neighbors",
+        "-k", "--k_neighbors",
         type=int,
         default=1,
         help="Number of neighbors to use for kneighbors queries"
@@ -182,8 +183,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o", "--output_dir",
         type=str,
-        default="plots/",
-        help="Directory to save plots"
+        default="output/",
+        help="Directory to save output plots"
     )
     args: Dict[str, Any] = vars(parser.parse_args())
 
@@ -206,8 +207,7 @@ if __name__ == "__main__":
     logging.info(f"Loaded config: {pformat(config)}")
 
     # Intialize model
-    model = torch.nn.DataParallel(Resnet50(config["embedding_size"]))
-    model.load_state_dict(checkpoint["model_state_dict"])
+    model = Resnet50(config["embedding_size"])
     model = model.to(device)
     logging.info(f"Initialized model: {model}")
 
@@ -222,9 +222,21 @@ if __name__ == "__main__":
     ])
     logging.info(f"Initialized transforms: {transform}")
 
+    # As the model is train with DataParallel (n_gpus=2),
+    # we need to divide batch_size by 2 to have identical result
+    batch_size: int = config["batch_size"]
+    n_cpus: int = cpu_count()
+    if n_cpus >= batch_size:
+        n_workers: int = batch_size
+    else:
+        n_workers: int = n_cpus
+    logging.info(f"Found {n_cpus} cpus. "
+                 f"Use {n_workers} threads for data loading "
+                 f"with batch_size={batch_size}")
+
     # Initialize reference set and reference loader
     reference_set = Dataset(args["reference_images_dir"], transform=transform)
-    reference_loader = DataLoader(reference_set, batch_size=32, shuffle=False, num_workers=8)
+    reference_loader = DataLoader(reference_set, batch_size=batch_size, shuffle=False, num_workers=n_workers)
     logging.info(f"Initialized reference loader: {reference_loader.dataset}")
 
     # Calculate embeddings from images in reference set
@@ -244,7 +256,7 @@ if __name__ == "__main__":
 
     # Initialize test set and test loader
     test_set = Dataset(args["test_images_dir"], transform=transform)
-    test_loader = DataLoader(test_set, batch_size=32, shuffle=False, num_workers=8)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=n_workers)
     logging.info(f"Initialized test loader: {test_loader.dataset}")
 
     # Calculate embeddings from images in reference set
@@ -253,7 +265,7 @@ if __name__ == "__main__":
         test_loader, model, device, return_numpy_array=True
     )
     end = time.time()
-    logging.info(f"Calculated {len(ref_embeddings)} embeddings in test set: {end - start} second")
+    logging.info(f"Calculated {len(test_embeddings)} embeddings in test set: {end - start} second")
 
     # Get predictions
     start = time.time()
@@ -268,7 +280,7 @@ if __name__ == "__main__":
 
     # Calculate metrics
     metrics = calculate_all_metrics(index, X_test=test_embeddings, y_test=test_labels, y_train=ref_labels)
-    logging.info(f"Done calculating {len(metrics)} metrics: {metrics.keys()}")
+    logging.info(f"Done calculating {len(metrics)} metrics: {metrics.items()}")
 
     # Plot confusion matrix
     title: str = f"{len(test_embeddings)} images ({len(test_set.class_to_idx)} classes)\n\n"
@@ -279,6 +291,7 @@ if __name__ == "__main__":
         test_set.idx_to_class[i].split("-")[-1]
         for i in range(len(test_set.idx_to_class))
     ]
+
     plot_confusion_matrix(
         y_pred=predicted_labels,
         y_true=test_labels,

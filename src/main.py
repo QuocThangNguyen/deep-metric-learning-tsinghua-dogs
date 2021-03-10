@@ -7,6 +7,8 @@ from torch_optimizer import RAdam
 
 import argparse
 import logging
+import json
+import time
 import sys
 import os
 import yaml
@@ -15,7 +17,7 @@ from typing import Dict, Any
 
 from src.trainer import train_one_epoch
 from src.models import Resnet50
-from src.losses import TripletMarginLoss, ProxyNCALoss
+from src.losses import TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss
 from src.samplers import PKSampler
 from src.dataset import Dataset, get_subset_from_dataset
 from src.utils import set_random_seed, get_current_time, log_embeddings_to_tensorboard
@@ -36,6 +38,8 @@ logger = logging.getLogger(__name__)
 
 
 def main(args: Dict[str, Any]):
+    start = time.time()
+
     # Intialize config
     config_path: str = args["config"]
     with open(config_path, "r", encoding="utf-8") as f:
@@ -93,6 +97,7 @@ def main(args: Dict[str, Any]):
                 config["classes_per_batch"],
                 config["samples_per_class"]
             ),
+            shuffle=False,
             num_workers=args["n_workers"],
             pin_memory=True,
         )
@@ -124,9 +129,29 @@ def main(args: Dict[str, Any]):
             smoothing_factor=config["smoothing_factor"],
             device=device
         )
+
+    elif args["loss"] == "proxy_anchor":
+        # Intialize train loader for proxy-anchor loss
+        batch_size: int = config["batch_size"]
+        train_loader = DataLoader(
+            train_set, config["batch_size"],
+            shuffle=True,
+            num_workers=args["n_workers"],
+            pin_memory=True,
+        )
+        logger.info(f"Initialized train_loader: {train_loader.dataset}")
+
+        loss_function = ProxyAnchorLoss(
+            n_classes=len(train_set.classes),
+            embedding_size=config["embedding_size"],
+            margin=config["margin"],
+            alpha=config["alpha"],
+            device=device
+        )
+
     else:
-        raise NotImplementedError("Only the following losses is supported: ['triplet', 'proxy_nca']"
-                                 f"Got {args['loss']}")
+        raise Exception("Only the following losses is supported: ['tripletloss', 'proxy_nca', 'proxy_anchor']. "
+                        f"Got {args['loss']}")
 
 
     # Initialize test transforms
@@ -152,7 +177,7 @@ def main(args: Dict[str, Any]):
 
 
     # Initialize reference set and reference loader
-    # If reference set is not given, use train set as reference set, but without sampling
+    # If reference set is not given, use train set as reference set, but without random sampling
     if not args["reference_dir"]:
         reference_set = Dataset(args["train_dir"], transform=transform_test)
     else:
@@ -180,13 +205,14 @@ def main(args: Dict[str, Any]):
     # Dictionary contains all metrics
     output_dict: Dict[str, Any] = {
         "total_epoch": args["n_epochs"],
-        "current_epoch": 1,
-        "current_iter": 1,
+        "current_epoch": 0,
+        "current_iter": 0,
         "metrics": {
             "mean_average_precision": 0.0,
             "average_precision_at_1": 0.0,
             "average_precision_at_5": 0.0,
             "average_precision_at_10": 0.0,
+            "top_1_accuracy": 0.0,
             "top_5_accuracy": 0.0,
             "normalized_mutual_information": 0.0,
         }
@@ -222,14 +248,19 @@ def main(args: Dict[str, Any]):
         writer.add_graph(model.module.features, dummy_input)
 
 
-    # Save all hyper-parameters and corresponding metrics to tensorboard for comparison
+    # Save all hyper-parameters and corresponding metrics
     logger.info("Saving all hyper-parameters")
     writer.add_hparams(
         config,
         metric_dict={f"hyperparams/{key}": value for key, value in output_dict["metrics"].items()}
     )
+    with open(os.path.join(checkpoint_dir, "output_dict.json"), "w") as f:
+        json.dump(output_dict, f)
+    logger.info(f"Dumped output_dict.json at {checkpoint_dir}")
 
-    logger.info("EVERYTHING IS DONE")
+
+    end = time.time()
+    logger.info(f"EVERYTHING IS DONE. Training time: {round(end - start, 2)} seconds")
 
 
 if __name__ == "__main__":
@@ -248,7 +279,7 @@ if __name__ == "__main__":
         "--config", type=str, required=True, help="Path to yaml config file"
     )
     parser.add_argument(
-        "--loss", type=str, required=True, help="Which loss to use: ['triplet', 'proxy_nca']"
+        "--loss", type=str, required=True, help="Which loss to use: ['tripletloss', 'proxy_nca', 'proxy_anchor']"
     )
     parser.add_argument(
         "--n_samples_per_reference_class",

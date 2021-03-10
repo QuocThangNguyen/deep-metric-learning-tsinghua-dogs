@@ -36,8 +36,9 @@ def calculate_all_metrics(model: nn.Module,
     mean_average_precision: float = sum(precision_at_k for precision_at_k in metrics.values()) / len(metrics)
     metrics["mean_average_precision"] = mean_average_precision
 
-    # Calculate top-5 accuracy
-    metrics["top_5_accuracy"] = calculate_topk_accuracy(distances, labels_test, labels_ref, top_k=5)
+    # Calculate top-1 and top-5 and top-10 accuracy
+    for i in k:
+        metrics[f"top_{i}_accuracy"] = calculate_topk_accuracy(distances, labels_test, labels_ref, top_k=i)
 
     # Calculate NMI score
     n_classes: int = len(test_loader.dataset.classes)

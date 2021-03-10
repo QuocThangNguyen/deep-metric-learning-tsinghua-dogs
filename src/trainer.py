@@ -30,21 +30,46 @@ def train_one_epoch(model: nn.Module,
                     output_dict: Dict[str, Any]
                     ) -> Dict[str, Any]:
 
-    total_epoch: int = output_dict["total_epoch"]
+    # Increase number of epochs so far
+    output_dict["current_epoch"] += 1
+    current_epoch: int = output_dict["current_epoch"]
+
     running_loss: float = 0.0
     running_fraction_hard_triplets: float = 0.0
 
     for images, labels in train_loader:
-        current_epoch: int = output_dict["current_epoch"]
+        # Increase number of iterations so far
+        output_dict["current_iter"] += 1
         current_iter: int = output_dict["current_iter"]
 
-        loss, fraction_hard_triplets = train_one_batch(model, optimizer, loss_function, images, labels, device)
-        running_loss += loss
-        running_fraction_hard_triplets += fraction_hard_triplets
+        # Run validation
+        if current_iter == 1 or (current_iter % validate_frequency == 0):
+            metrics: Dict[str, Any] = calculate_all_metrics(model, reference_loader, test_loader, device)
+            log_info_metrics(logger, metrics, current_epoch, current_iter)
+
+            # Log all metrics to tensorboard
+            for metric_name, value in metrics.items():
+                writer.add_scalar(f"test/{metric_name}", value, current_iter)
+
+            # Save checkpoint with highest MAP
+            if metrics['mean_average_precision'] > output_dict["metrics"]["mean_average_precision"]:
+                output_dict["metrics"] = metrics
+                save_checkpoint(
+                    model,
+                    config,
+                    current_epoch,
+                    current_iter,
+                    checkpoint_dir,
+                    metrics['mean_average_precision'],
+                )
+
+        output_batch: Dict[str, Any] = train_one_batch(model, optimizer, loss_function, images, labels, device)
+        running_loss += output_batch["loss"]
+        running_fraction_hard_triplets += output_batch["fraction_hard_triplets"]
 
         # Logging to tensorboard
-        writer.add_scalar("train/loss", loss, current_iter)
-        writer.add_scalar("train/fraction_hard_triplets", fraction_hard_triplets, current_iter)
+        for metric_name, value in output_batch.items():
+            writer.add_scalar(f"train/{metric_name}", value, current_iter)
 
         # Logging to standard output stream
         if current_iter % log_frequency == 0:
@@ -58,61 +83,25 @@ def train_one_epoch(model: nn.Module,
             running_loss = 0.0
             running_fraction_hard_triplets = 0.0
 
-        # Run validation
-        if current_iter == 1 or (current_iter % validate_frequency == 0):
-            metrics: Dict[str, Any] = calculate_all_metrics(model, reference_loader, test_loader, device)
-            logger.info("*" * 120)
-            logger.info(
-                f"VALIDATING\t[{current_epoch}|{current_iter}]\t"
-                f"MAP: {metrics['mean_average_precision']:.2f}%\t"
-                f"AP@1: {metrics['average_precision_at_1']:.2f}%\t"
-                f"AP@5: {metrics['average_precision_at_5']:.2f}%\t"
-                f"AP@10: {metrics['average_precision_at_10']:.2f}%\t"
-                f"top5: {metrics['top_5_accuracy']:.2f}%\t"
-                f"NMI: {metrics['normalized_mutual_information']:.2f}\t"
-            )
-            logger.info("*" * 120)
-
-            # Log all metrics to tensorboard
-            for metric_name, value in metrics.items():
-                writer.add_scalar(f"test/{metric_name}", value, current_iter)
-
-            # Save checkpoint with highest test accuracy
-            if metrics['mean_average_precision'] > output_dict["metrics"]["mean_average_precision"]:
-                # Update metrics in output
-                output_dict["metrics"] = metrics
-                save_checkpoint(
-                    checkpoint_dir,
-                    model,
-                    config,
-                    loss,
-                    metrics['mean_average_precision'],
-                    current_epoch,
-                    current_iter
-                )
-        # Increase number of iterations so far
-        output_dict["current_iter"] += 1
 
     # Run validation at the final iteration
-    if output_dict["current_epoch"] == total_epoch:
+    if output_dict["current_epoch"] == output_dict["total_epoch"]:
         metrics: Dict[str, Any] = calculate_all_metrics(model, reference_loader, test_loader, device)
-        logger.info("*" * 120)
-        logger.info(
-            f"VALIDATING\t[{current_epoch}|{current_iter}]\t"
-            f"MAP: {metrics['mean_average_precision']:.2f}%\t"
-            f"AP@1: {metrics['average_precision_at_1']:.2f}%\t"
-            f"AP@5: {metrics['average_precision_at_5']:.2f}%\t"
-            f"AP@10: {metrics['average_precision_at_10']:.2f}%\t"
-            f"top5: {metrics['top_5_accuracy']:.2f}%\t"
-            f"NMI: {metrics['normalized_mutual_information']:.2f}\t"
-        )
-        logger.info("*" * 120)
-        # Log all metrics to tensorboard
+        log_info_metrics(logger, metrics, current_epoch, current_iter)
+
         for metric_name, value in metrics.items():
             writer.add_scalar(f"test/{metric_name}", value, current_iter)
 
-    # Increase number of epochs so far
-    output_dict["current_epoch"] += 1
+        if metrics['mean_average_precision'] > output_dict["metrics"]["mean_average_precision"]:
+            output_dict["metrics"] = metrics
+            save_checkpoint(
+                model,
+                config,
+                current_epoch,
+                current_iter,
+                checkpoint_dir,
+                metrics['mean_average_precision'],
+            )
     return output_dict
 
 
@@ -135,4 +124,24 @@ def train_one_batch(model: nn.Module,
     loss.backward()
     optimizer.step()
 
-    return loss.item(), float(fraction_hard_triplets)
+    return {
+        "loss": loss.item(),
+        "fraction_hard_triplets": float(fraction_hard_triplets)
+    }
+
+
+def log_info_metrics(logger, metrics: Dict[str, float], current_epoch: int, current_iter: int) -> None:
+    """
+    Print all metrics to stdout
+    """
+    logger.info("*" * 130)
+    logger.info(
+        f"VALIDATING\t[{current_epoch}|{current_iter}]\t"
+        f"MAP: {metrics['mean_average_precision']:.2f}%\t"
+        f"AP@1: {metrics['average_precision_at_1']:.2f}%\t"
+        f"AP@5: {metrics['average_precision_at_5']:.2f}%\t"
+        f"Top-1: {metrics['top_1_accuracy']:.2f}%\t"
+        f"Top-5: {metrics['top_5_accuracy']:.2f}%\t"
+        f"NMI: {metrics['normalized_mutual_information']:.2f}\t"
+    )
+    logger.info("*" * 130)

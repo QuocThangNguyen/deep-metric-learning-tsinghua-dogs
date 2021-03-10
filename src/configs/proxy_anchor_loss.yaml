@@ -1,6 +1,6 @@
 {
     # Learning rate
-    "lr": 0.001,
+    "lr": 0.0001,
     # Size of images to be resized before training
     "image_size": 448,
     # Size of output embedding vector

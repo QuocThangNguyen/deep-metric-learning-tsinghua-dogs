@@ -108,8 +108,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o", "--output_dir",
         type=str,
-        default="plots/",
-        help="Directory to save plots"
+        default="output/",
+        help="Directory to save output plots"
     )
     parser.add_argument(
         "-n", "--n_images",

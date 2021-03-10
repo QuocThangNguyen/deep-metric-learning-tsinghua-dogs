@@ -26,20 +26,24 @@ def get_current_time() -> str:
     return datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
 
-def save_checkpoint(output_dir: str,
-                    model: nn.Module,
+def save_checkpoint(model: nn.Module,
                     config: Dict[str, Any],
-                    train_loss: float,
-                    mean_average_precision: float,
                     current_epoch: int,
                     current_iter: int,
+                    output_dir: str,
+                    mean_average_precision: float = None,
                     ) -> str:
-    checkpoint_name: str = f"epoch{current_epoch}-iter{current_iter}-loss{train_loss:.4f}-map{mean_average_precision:.2f}.pth"
+
+    checkpoint_name: str = f"epoch{current_epoch}-iter{current_iter}"
+    if mean_average_precision is not None:
+        checkpoint_name += f"-map{mean_average_precision:.2f}"
+    checkpoint_name += ".pth"
+
     checkpoint_path: str = os.path.join(output_dir, checkpoint_name)
     torch.save(
         {
             "config": config,
-            "model_state_dict": model.state_dict(),
+            "model_state_dict": model.module.state_dict(),
         },
         checkpoint_path
     )
@@ -50,11 +54,11 @@ def log_embeddings_to_tensorboard(loader: DataLoader,
                                   model: nn.Module,
                                   device: torch.device,
                                   writer: SummaryWriter,
-                                  tag: str) -> None:
+                                  tag: str
+                                  ) -> None:
     if tag == "train":
         if hasattr(loader.sampler, "sequential_sampling"):
             loader.sampler.sequential_sampling = True
-
     # Calculating embedding of training set for visualization
     embeddings, labels = get_embeddings_from_dataloader(loader, model, device)
     writer.add_embedding(embeddings, metadata=labels.tolist(), tag=tag)
@@ -71,8 +75,8 @@ def get_embeddings_from_dataloader(loader: DataLoader,
 
     embeddings_ls: List[torch.Tensor] = []
     labels_ls: List[torch.Tensor] = []
-    for images, labels_ in loader:
-        images: torch.Tensor = images.to(device, non_blocking=True)
+    for images_, labels_ in loader:
+        images: torch.Tensor = images_.to(device, non_blocking=True)
         labels: torch.Tensor = labels_.to(device, non_blocking=True)
         embeddings: torch.Tensor = model(images)
         embeddings_ls.append(embeddings)
