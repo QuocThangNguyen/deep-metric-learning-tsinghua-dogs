@@ -208,8 +208,22 @@ if __name__ == "__main__":
 
     # Intialize model
     model = Resnet50(config["embedding_size"])
+    model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
     logging.info(f"Initialized model: {model}")
+
+    # Initialize batch size and n_workers
+    batch_size: int = config.get("batch_size", None)
+    if not batch_size:
+        batch_size = config["classes_per_batch"] * config["samples_per_class"]
+    n_cpus: int = cpu_count()
+    if n_cpus >= batch_size:
+        n_workers: int = batch_size
+    else:
+        n_workers: int = n_cpus
+    logging.info(f"Found {n_cpus} cpus. "
+                 f"Use {n_workers} threads for data loading "
+                 f"with batch_size={batch_size}")
 
     # Initialize transform
     transform = T.Compose([
@@ -221,18 +235,6 @@ if __name__ == "__main__":
         ),
     ])
     logging.info(f"Initialized transforms: {transform}")
-
-    # As the model is train with DataParallel (n_gpus=2),
-    # we need to divide batch_size by 2 to have identical result
-    batch_size: int = config["batch_size"]
-    n_cpus: int = cpu_count()
-    if n_cpus >= batch_size:
-        n_workers: int = batch_size
-    else:
-        n_workers: int = n_cpus
-    logging.info(f"Found {n_cpus} cpus. "
-                 f"Use {n_workers} threads for data loading "
-                 f"with batch_size={batch_size}")
 
     # Initialize reference set and reference loader
     reference_set = Dataset(args["reference_images_dir"], transform=transform)
@@ -279,8 +281,8 @@ if __name__ == "__main__":
     logging.info(f"Done predicting for {len(test_embeddings)} queries: {end - start} seconds")
 
     # Calculate metrics
-    metrics = calculate_all_metrics(index, X_test=test_embeddings, y_test=test_labels, y_train=ref_labels)
-    logging.info(f"Done calculating {len(metrics)} metrics: {metrics.items()}")
+    metrics: Dict = calculate_all_metrics(index, X_test=test_embeddings, y_test=test_labels, y_train=ref_labels)
+    logging.info(f"Done calculating {len(metrics)} metrics: {pformat(metrics.items())}")
 
     # Plot confusion matrix
     title: str = f"{len(test_embeddings)} images ({len(test_set.class_to_idx)} classes)\n\n"

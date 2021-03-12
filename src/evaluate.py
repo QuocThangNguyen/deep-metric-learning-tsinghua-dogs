@@ -9,19 +9,19 @@ from src.utils import get_embeddings_from_dataloader
 
 
 def calculate_all_metrics(model: nn.Module,
-                          reference_loader: DataLoader,
                           test_loader: DataLoader,
+                          ref_loader: DataLoader,
                           device: torch.device,
                           k: Tuple[int, int, int] = (1, 5, 10)
                           ) -> Dict[str, float]:
 
     # Calculate all embeddings of training set and test set
-    embeddings_ref, labels_ref = get_embeddings_from_dataloader(reference_loader, model, device)
     embeddings_test, labels_test = get_embeddings_from_dataloader(test_loader, model, device)
+    embeddings_ref, labels_ref = get_embeddings_from_dataloader(ref_loader, model, device)
 
     # Expand dimension for batch calculating
-    embeddings_test = embeddings_test.unsqueeze(dim=0)  # [M x K] -> [1 x M x F]
-    embeddings_ref = embeddings_ref.unsqueeze(dim=0)  # [N x K] -> [1 x N x F]
+    embeddings_test = embeddings_test.unsqueeze(dim=0)  # [M x K] -> [1 x M x embedding_size]
+    embeddings_ref = embeddings_ref.unsqueeze(dim=0)  # [N x K] -> [1 x N x embedding_size]
     labels_test = labels_test.unsqueeze(dim=1)  # [M] -> [M x 1]
 
     # Pairwise distance of all embeddings between test set and reference set
@@ -30,16 +30,22 @@ def calculate_all_metrics(model: nn.Module,
     # Calculate precision_at_k on test set with k=1, k=5 and k=10
     metrics: Dict[str, float] = {}
     for i in k:
-        metrics[f"average_precision_at_{i}"] = calculate_precision_at_k(distances, labels_test, labels_ref, k=i)
-
+        metrics[f"average_precision_at_{i}"] = calculate_precision_at_k(distances,
+                                                                        labels_test,
+                                                                        labels_ref,
+                                                                        k=i
+                                                                        )
     # Calculate mean average precision (MAP)
     mean_average_precision: float = sum(precision_at_k for precision_at_k in metrics.values()) / len(metrics)
     metrics["mean_average_precision"] = mean_average_precision
 
     # Calculate top-1 and top-5 and top-10 accuracy
     for i in k:
-        metrics[f"top_{i}_accuracy"] = calculate_topk_accuracy(distances, labels_test, labels_ref, top_k=i)
-
+        metrics[f"top_{i}_accuracy"] = calculate_topk_accuracy(distances,
+                                                               labels_test,
+                                                               labels_ref,
+                                                               top_k=i
+                                                               )
     # Calculate NMI score
     n_classes: int = len(test_loader.dataset.classes)
     metrics["normalized_mutual_information"] = calculate_normalized_mutual_information(

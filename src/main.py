@@ -91,7 +91,8 @@ def main(args: Dict[str, Any]):
         # Initialize train loader for triplet loss
         batch_size: int = config["classes_per_batch"] * config["samples_per_class"]
         train_loader = DataLoader(
-            train_set, batch_size,
+            train_set,
+            batch_size,
             sampler=PKSampler(
                 train_set.targets,
                 config["classes_per_batch"],
@@ -114,7 +115,8 @@ def main(args: Dict[str, Any]):
         # Initialize train loader for proxy-nca loss
         batch_size: int = config["batch_size"]
         train_loader = DataLoader(
-            train_set, config["batch_size"],
+            train_set,
+            config["batch_size"],
             shuffle=True,
             num_workers=args["n_workers"],
             pin_memory=True,
@@ -134,7 +136,8 @@ def main(args: Dict[str, Any]):
         # Intialize train loader for proxy-anchor loss
         batch_size: int = config["batch_size"]
         train_loader = DataLoader(
-            train_set, config["batch_size"],
+            train_set,
+            config["batch_size"],
             shuffle=True,
             num_workers=args["n_workers"],
             pin_memory=True,
@@ -255,7 +258,7 @@ def main(args: Dict[str, Any]):
         metric_dict={f"hyperparams/{key}": value for key, value in output_dict["metrics"].items()}
     )
     with open(os.path.join(checkpoint_dir, "output_dict.json"), "w") as f:
-        json.dump(output_dict, f)
+        json.dump(output_dict, f, indent=4)
     logger.info(f"Dumped output_dict.json at {checkpoint_dir}")
 
 

@@ -11,6 +11,7 @@ import seaborn as sns
 
 import argparse
 import os
+from multiprocessing import cpu_count
 import time
 from pprint import pformat
 import logging
@@ -229,10 +230,23 @@ if __name__ == "__main__":
     logging.info(f"Loaded config: {pformat(config)}")
 
     # Intialize model
-    model = torch.nn.DataParallel(Resnet50(config["embedding_size"]))
+    model = Resnet50(config["embedding_size"])
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
     logging.info(f"Initialized model: {model}")
+
+    # Initialize batch size and n_workers
+    batch_size: int = config.get("batch_size", None)
+    if not batch_size:
+        batch_size = config["classes_per_batch"] * config["samples_per_class"]
+    n_cpus: int = cpu_count()
+    if n_cpus >= batch_size:
+        n_workers: int = batch_size
+    else:
+        n_workers: int = n_cpus
+    logging.info(f"Found {n_cpus} cpus. "
+                 f"Use {n_workers} threads for data loading "
+                 f"with batch_size={batch_size}")
 
     # Initialize transform
     transform = T.Compose([
@@ -247,7 +261,7 @@ if __name__ == "__main__":
 
     # Initialize dataset and dataloader
     dataset = Dataset(args["images_dir"], transform=transform)
-    loader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=8)
+    loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=n_workers)
     logging.info(f"Initialized loader: {loader.dataset}")
 
     # Calculate embeddings from images in reference set

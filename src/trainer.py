@@ -19,8 +19,8 @@ def train_one_epoch(model: nn.Module,
                     optimizer: Optimizer,
                     loss_function: TripletMarginLoss,
                     train_loader: DataLoader,
-                    reference_loader: DataLoader,
                     test_loader: DataLoader,
+                    reference_loader: DataLoader,
                     writer: SummaryWriter,
                     device: torch.device,
                     config: Dict[str, Any],
@@ -44,14 +44,14 @@ def train_one_epoch(model: nn.Module,
 
         # Run validation
         if current_iter == 1 or (current_iter % validate_frequency == 0):
-            metrics: Dict[str, Any] = calculate_all_metrics(model, reference_loader, test_loader, device)
+            metrics: Dict[str, Any] = calculate_all_metrics(model.module, test_loader, reference_loader, device)
             log_info_metrics(logger, metrics, current_epoch, current_iter)
 
             # Log all metrics to tensorboard
             for metric_name, value in metrics.items():
                 writer.add_scalar(f"test/{metric_name}", value, current_iter)
 
-            # Save checkpoint with highest MAP
+            # Save checkpoint that has highest MAP
             if metrics['mean_average_precision'] > output_dict["metrics"]["mean_average_precision"]:
                 output_dict["metrics"] = metrics
                 save_checkpoint(
@@ -83,10 +83,9 @@ def train_one_epoch(model: nn.Module,
             running_loss = 0.0
             running_fraction_hard_triplets = 0.0
 
-
     # Run validation at the final iteration
     if output_dict["current_epoch"] == output_dict["total_epoch"]:
-        metrics: Dict[str, Any] = calculate_all_metrics(model, reference_loader, test_loader, device)
+        metrics: Dict[str, Any] = calculate_all_metrics(model.module, test_loader, reference_loader, device)
         log_info_metrics(logger, metrics, current_epoch, current_iter)
 
         for metric_name, value in metrics.items():
