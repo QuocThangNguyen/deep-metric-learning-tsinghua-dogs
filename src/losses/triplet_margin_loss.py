@@ -81,7 +81,7 @@ def _batch_hardest_triplets_loss(labels: torch.Tensor,
     triplet_loss: torch.Tensor = hardest_positive_distance - hardest_negative_distance + margin
     triplet_loss[triplet_loss < 0] = 0
     triplet_loss = triplet_loss.mean()
-    return triplet_loss, -1
+    return triplet_loss, 0
 
 
 def _get_triplet_masks(labels: torch.Tensor) -> torch.Tensor:
