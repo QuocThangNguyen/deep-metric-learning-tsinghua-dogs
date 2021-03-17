@@ -55,12 +55,12 @@ I also evaluate models' performance on some common metrics:
     - Random affine with rotation, scale and translation.
 
 
-|                   	| MAP    	| P@1    	| P@5    	| P@10   	| Top-5  	| NMI  	| Download 	|
-|-------------------	|--------	|--------	|--------	|--------	|--------	|------	|----------	|
-| Triplet loss      	| 73.85% 	| 74.66% 	| 73.90  	| 73.00% 	| 93.76% 	| 0.82 	|          	|
-| Proxy-NCA loss    	| 89.10% 	| 90.26% 	| 89.28% 	| 87.76% 	| 99.39% 	| 0.98 	|          	|
-| Proxy-anchor loss 	|        	|        	|        	|        	|        	|      	|          	|
-| Soft-triple loss  	|        	|        	|        	|        	|        	|      	|          	|
+|                   	| MAP    	| P@1    	| P@5    	| Top-1  	| Top-5  	| NMI    	| Download 	|
+|-------------------	|--------	|--------	|--------	|--------	|--------	|--------	|----------	|
+| Triplet loss      	| 70.26% 	| 70.92% 	| 70.16% 	| 70.92% 	| 85.73% 	| 82.00% 	|          	|
+| Proxy-NCA loss    	|        	|        	|        	|        	|        	|        	|          	|
+| Proxy-anchor loss 	|        	|        	|        	|        	|        	|        	|          	|
+| Soft-triple loss  	|        	|        	|        	|        	|        	|        	|          	|
 
 
 <br>
