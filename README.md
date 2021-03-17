@@ -67,6 +67,10 @@ I also evaluate models' performance on some common metrics:
 <br>
 
 # 3. Visualization on validation set
+## Training logs for all loss
+<img src="./static/tensorboard.png">
+
+
 ## Proxy-Anchor loss
 ### **T-SNE**
 <img src="./static/proxynca-resnet50/tsne_points.jpg">
@@ -226,6 +230,7 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 │   ├── checkpoints  # Directory to save model's weights while training
 │   ├── configs  # Configurations for each loss function
 │   │   ├── proxy_nca_loss.yaml
+│   │   ├── proxy_anchor_loss.yaml
 │   │   └── triplet_loss.yaml
 │   ├── dataset.py
 │   ├── evaluate.py  # Calculate mean average precision, accuracy and NMI score
@@ -234,6 +239,7 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 │   ├── losses
 │   │   ├── __init__.py
 │   │   ├── proxy_nca_loss.py
+│   │   ├── proxy_anchor_loss.py
 │   │   └── triplet_margin_loss.py
 │   ├── models  # Feature extraction models
 │   │   ├── __init__.py
@@ -250,26 +256,4 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 │   ├── trainer.py  # Helper functions for training
 │   └── utils.py  # Some utility functions
 └── static
-    ├── proxynca-resnet50
-    │   ├── confusion_matrix.jpg
-    │   ├── similarity.jpg
-    │   ├── tsne_images.jpg
-    │   └── tsne_points.jpg
-    └── tripletloss-resnet50
-        ├── confusion_matrix.jpg
-        ├── similarity.jpg
-        ├── tsne_images.jpg
-        └── tsne_points.jpg
-
-
 ```
-
-## 7. Acknowledgement
-
-    @article{Zou2020ThuDogs,
-        title={A new dataset of dog breed images and a benchmark for fine-grained classification},
-        author={Zou, Ding-Nan and Zhang, Song-Hai and Mu, Tai-Jiang and Zhang, Min},
-        journal={Computational Visual Media},
-        year={2020},
-        url={https://doi.org/10.1007/s41095-020-0184-6}
-    }
