@@ -66,34 +66,22 @@ I also evaluate models' performance on some common metrics:
 <br>
 <br>
 
-# 3. Visualization
-## Proxy-NCA loss
-### **Confusion matrix on validation set**
-<img src="./static/proxynca-resnet50/confusion_matrix.jpg">
-
-### **T-SNE on validation set**
+# 3. Visualization on validation set
+## Proxy-Anchor loss
+### **T-SNE**
 <img src="./static/proxynca-resnet50/tsne_points.jpg">
 <img src="./static/proxynca-resnet50/tsne_images.jpg">
 
-### **Similarity matrix of some images in validation set**
+### **Similarity matrix**
 - Each cell represent the L2 distance between 2 images.
 - The closer distance to 0 (**blue**), the more **similar**.
 - The larger distance (**green**), the more **dissimilar**.
 <img src="./static/proxynca-resnet50/similarity.jpg">
 
-## Triplet loss
-### **Confusion matrix on validation set**
-<img src="./static/tripletloss-resnet50/../proxynca-resnet50/confusion_matrix.jpg">
+### **Confusion matrix**
+<img src="./static/proxynca-resnet50/confusion_matrix.jpg">
 
-### **T-SNE on validation set**
-<img src="./static/tripletloss-resnet50/tsne_points.jpg">
-<img src="./static/tripletloss-resnet50/tsne_images.jpg">
-
-### **Similarity matrix of some images in validation set**
-- Each cell represent the L2 distance between 2 images.
-- The closer distance to 0 (**blue**), the more **similar**.
-- The larger distance (**green**), the more **dissimilar**.
-<img src="./static/tripletloss-resnet50/similarity.jpg">
+## For visualization of other loss functions, check out directory [static](static/)
 
 <br>
 <br>
