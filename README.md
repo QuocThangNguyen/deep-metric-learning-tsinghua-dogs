@@ -59,7 +59,7 @@ I also evaluate models' performance on some common metrics:
 |-------------------	|--------	|--------	|--------	|--------	|--------	|--------	|----------	|
 | Triplet loss      	| 70.26% 	| 70.92% 	| 70.16% 	| 70.92% 	| 85.73% 	| 82.00% 	|          	|
 | Proxy-NCA loss    	| 75.90% 	| 76.00% 	| 75.89% 	| 76.00% 	| 79.38% 	| 81.43% 	|          	|
-| Proxy-anchor loss 	|        	|        	|        	|        	|        	|        	|          	|
+| Proxy-anchor loss 	| 78.81% 	| 79.17% 	| 78.70% 	| 79.17% 	| 82.15% 	| 83.09% 	|          	|
 | Soft-triple loss  	|        	|        	|        	|        	|        	|        	|          	|
 
 
