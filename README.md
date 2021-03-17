@@ -29,8 +29,8 @@ For fine-grained data, in which the intra-class variances are larger than inter-
 In this projects, I use deep metric learning to classify dog images in Tsinghua Dogs dataset. Those loss functions are implemented:
 1. [Triplet loss](https://arxiv.org/abs/1503.03832)
 2. [Proxy-NCA loss](https://arxiv.org/abs/1703.07464)
-3. [Proxy-anchor loss](https://arxiv.org/abs/2003.13911): In progress
-4. [Soft-triple loss](https://arxiv.org/abs/1909.05235): In progress
+3. [Proxy-anchor loss](https://arxiv.org/abs/2003.13911)
+4. [Soft-triple loss](https://arxiv.org/abs/1909.05235)
 
 I also evaluate models' performance on some common metrics:
 
@@ -80,6 +80,7 @@ I also evaluate models' performance on some common metrics:
 - Each cell represent the L2 distance between 2 images.
 - The closer distance to 0 (**blue**), the more **similar**.
 - The larger distance (**green**), the more **dissimilar**.
+- The diagonal represents the L2 distance of an image to itself.
 <img src="./static/proxynca-resnet50/similarity.jpg">
 
 ### **Confusion matrix**
