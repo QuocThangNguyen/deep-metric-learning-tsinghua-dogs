@@ -80,7 +80,7 @@ I also evaluate models' performance on some common metrics:
 - Each cell represent the L2 distance between 2 images.
 - The closer distance to 0 (**blue**), the more **similar**.
 - The larger distance (**green**), the more **dissimilar**.
-- The diagonal represents the L2 distance of an image to itself.
+- The diagonal represents the distance of an image to itself.
 <img src="./static/proxynca-resnet50/similarity.jpg">
 
 ### **Confusion matrix**
@@ -153,6 +153,11 @@ data/
 - Train with proxy-nca loss
 ```sh
 CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/main.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_nca --config src/configs/proxy_nca_loss.yaml --checkpoint_root_dir src/checkpoints/proxynca-resnet50
+```
+
+- Train with proxy-anchor loss
+```sh
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/main.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_anchor --config src/configs/proxy_anchor_loss.yaml --checkpoint_root_dir src/checkpoints/proxyanchor-resnet50
 ```
 
 - Train with triplet loss
@@ -232,6 +237,7 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 │   ├── configs  # Configurations for each loss function
 │   │   ├── proxy_nca_loss.yaml
 │   │   ├── proxy_anchor_loss.yaml
+│   │   ├── soft_triple_loss.yaml
 │   │   └── triplet_loss.yaml
 │   ├── dataset.py
 │   ├── evaluate.py  # Calculate mean average precision, accuracy and NMI score
@@ -241,10 +247,11 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 │   │   ├── __init__.py
 │   │   ├── proxy_nca_loss.py
 │   │   ├── proxy_anchor_loss.py
+│   │   ├── soft_triple_loss.py
 │   │   └── triplet_margin_loss.py
-│   ├── models  # Feature extraction models
+│   ├── models
 │   │   ├── __init__.py
-│   │   └── resnet.py
+│   │   └── resnet.py  # Model
 │   ├── samplers
 │   │   ├── __init__.py
 │   │   └── pk_sampler.py  # Sample triplets in each batch for triplet loss
