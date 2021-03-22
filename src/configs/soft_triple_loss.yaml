@@ -1,0 +1,22 @@
+{
+    # Learning rate
+    "lr": 0.0001,
+    # Size of images to be resized before training
+    "image_size": 448,
+    # Size of output embedding vector
+    "embedding_size": 128,
+    # Batch size
+    "batch_size": 48,
+    # Numbers of centers for each class
+    "n_centers_per_class": 5,
+    # lambda is for calculating distance probability. See section 3.2 in the paper for more detail.
+    "lambda": 20,
+    # gamma is for calculating cross entropy loss. See section 3.2 in the paper for more detail.
+    "gamma": 0.1,
+    # tau is for regularization. See section 3.2 in the paper for more detail.
+    "tau": 0.,
+    # Margin factor
+    "margin": 0.01,
+    # Whether to use pretrained weight on ImageNet or not
+    "pretrained": True,
+}

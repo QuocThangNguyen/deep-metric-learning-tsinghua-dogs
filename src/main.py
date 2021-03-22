@@ -17,7 +17,7 @@ from typing import Dict, Any
 
 from src.trainer import train_one_epoch
 from src.models import Resnet50
-from src.losses import TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss
+from src.losses import TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss, SoftTripleLoss
 from src.samplers import PKSampler
 from src.dataset import Dataset, get_subset_from_dataset
 from src.utils import set_random_seed, get_current_time, log_embeddings_to_tensorboard
@@ -152,8 +152,31 @@ def main(args: Dict[str, Any]):
             device=device
         )
 
+    elif args["loss"] == "soft_triple":
+        # Intialize train loader for proxy-anchor loss
+        batch_size: int = config["batch_size"]
+        train_loader = DataLoader(
+            train_set,
+            config["batch_size"],
+            shuffle=True,
+            num_workers=args["n_workers"],
+            pin_memory=True,
+        )
+        logger.info(f"Initialized train_loader: {train_loader.dataset}")
+
+        loss_function = SoftTripleLoss(
+            n_classes=len(train_set.classes),
+            embedding_size=config["embedding_size"],
+            n_centers_per_class=config["n_centers_per_class"],
+            lambda_=config["lambda"],
+            gamma=config["gamma"],
+            tau=config["tau"],
+            margin=config["margin"],
+            device=device
+        )
     else:
-        raise Exception("Only the following losses is supported: ['tripletloss', 'proxy_nca', 'proxy_anchor']. "
+        raise Exception("Only the following losses is supported: "
+                        "['tripletloss', 'proxy_nca', 'proxy_anchor', 'soft_triple']. "
                         f"Got {args['loss']}")
 
 

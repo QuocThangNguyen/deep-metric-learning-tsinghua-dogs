@@ -12,6 +12,7 @@ class ProxyAnchorLoss(nn.Module):
     def __init__(self, n_classes: int, embedding_size: int, margin: float, alpha: float, device: torch.device):
         super().__init__()
 
+        self.device: torch.device = device
         self.n_classes: int = n_classes
         self.embedding_size: int = embedding_size
 
@@ -21,7 +22,6 @@ class ProxyAnchorLoss(nn.Module):
 
         self.margin: float = margin
         self.alpha: float = alpha
-        self.device: torch.device = device
 
     def forward(self, embeddings: torch.Tensor, labels: torch.Tensor) -> Tuple[torch.Tensor, int]:
         # proxies shape: [n_classes * embedding_size]
