@@ -118,7 +118,7 @@ reference_images_dir/
 
 With above structure, you can have corresponding label for each retrieved images:
 ```sh
-PYTHONPATH=./ python src/infer.py --image_path data/TsinghuaDogs/val/1043-n000001-Shiba_Dog/n100648.jpeg --reference_images_dir reference_images_dir --checkpoint_path src/checkpoints/TsinghuaDogs/proxynca-resnet50.pth --labeled_folders
+PYTHONPATH=./ python src/infer.py --image_path shiba.jpeg --reference_images_dir reference_images_dir --checkpoint_path src/checkpoints/TsinghuaDogs/proxynca-resnet50.pth --labeled_folders
 ```
 
 Or all images in the same folder, however, you won't have corresponding label for each retrieved image with this way:
@@ -137,7 +137,7 @@ reference_images_dir/
 ```
 
 ```sh
-PYTHONPATH=./ python src/infer.py --image_path data/TsinghuaDogs/val/1043-n000001-Shiba_Dog/n100648.jpeg --reference_images_dir reference_images_dir --checkpoint_path src/checkpoints/TsinghuaDogs/proxynca-resnet50.pth
+PYTHONPATH=./ python src/infer.py --image_path shiba.jpeg --reference_images_dir reference_images_dir --checkpoint_path src/checkpoints/TsinghuaDogs/proxynca-resnet50.pth
 ```
 
 # 5. Train
