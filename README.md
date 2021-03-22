@@ -152,20 +152,20 @@ data/
 
 - Train with proxy-nca loss
 ```sh
-CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/main.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_nca --config src/configs/proxy_nca_loss.yaml --checkpoint_root_dir src/checkpoints/proxynca-resnet50
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/train.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_nca --config src/configs/proxy_nca_loss.yaml --checkpoint_root_dir src/checkpoints/proxynca-resnet50
 ```
 
 - Train with proxy-anchor loss
 ```sh
-CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/main.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_anchor --config src/configs/proxy_anchor_loss.yaml --checkpoint_root_dir src/checkpoints/proxyanchor-resnet50
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/train.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss proxy_anchor --config src/configs/proxy_anchor_loss.yaml --checkpoint_root_dir src/checkpoints/proxyanchor-resnet50
 ```
 
 - Train with triplet loss
 ```sh
-CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/main.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss tripletloss --config src/configs/triplet_loss.yaml --checkpoint_root_dir src/checkpoints/tripletloss-resnet50
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/train.py --train_dir data/TsinghuaDogs/train --test_dir data/TsinghuaDogs/val --loss tripletloss --config src/configs/triplet_loss.yaml --checkpoint_root_dir src/checkpoints/tripletloss-resnet50
 ```
 
-Run `PYTHONPATH=./ python src/main.py --help` for more detail about arguments.
+Run `PYTHONPATH=./ python src/train.py --help` for more detail about arguments.
 
 If you want to train on 2 gpus, replace `CUDA_VISIBLE_DEVICES=0` with `CUDA_VISIBLE_DEVICES=0,1` and so on.
 
@@ -232,7 +232,7 @@ PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/Tshi
 ├── __init__.py
 ├── README.md
 ├── src
-│   ├── main.py  # Entry point for training.
+│   ├── train.py  # Entry point for training.
 │   ├── checkpoints  # Directory to save model's weights while training
 │   ├── configs  # Configurations for each loss function
 │   │   ├── proxy_nca_loss.yaml
