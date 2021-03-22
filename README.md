@@ -107,7 +107,7 @@ conda install -n dml pytorch torchvision cudatoolkit=10.2 -c pytorch
 conda install -n dml faiss-gpu cudatoolkit=10.2 -c pytorch
 
 # Install other dependencies
-pip install opencv-python tensorboard torch-summary torch_optimizer scikit-learn matplotlib seaborn requests ipdb flake8 pyyaml
+pip install opencv-python tensorboard torch-summary torch_optimizer scikit-learn matplotlib seaborn requests ipdb flake8 pyyaml natsort
 ```
 
 ## 4.2 Prepare Tsinghua Dogs dataset
