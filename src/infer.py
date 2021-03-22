@@ -151,10 +151,10 @@ def visualize_query(query_image_path: str,
         distance: float = round(retrieved_distances[i], 4)
         axs[row, col].imshow(retrieved_image)
 
-        title: str = f"Retrieve\nDistance: {distance}"
+        title: str = f"Top {i + 1}\nDistance: {distance}"
         if retrieved_labels:
             label: str = retrieved_labels[i]
-            title = f"Retrieve: {label}\nDistance: {distance}"
+            title = f"Top {i + 1}: {label}\nDistance: {distance}"
         axs[row, col].set_title(title, fontsize=30)
 
     # Turn off axis for all plots
