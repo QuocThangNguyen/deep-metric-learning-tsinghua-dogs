@@ -57,12 +57,12 @@ I also evaluate models' performance on some common metrics:
     - Random affine with rotation, scale and translation.
 
 
-|                   	    | MAP    	    | P@1    	    | P@5    	    | Top-1  	    | Top-5  	    | NMI    	| Download 	|
-|-------------------	    |--------	    |--------	    |--------	    |--------	    |--------	    |--------	|----------	|
-| Triplet loss      	    | 70.26% 	    | 70.92% 	    | 70.16% 	    | 70.92% 	    | 85.73% 	    | 82.00% 	|          	|
-| Proxy-NCA loss    	    | 75.90% 	    | 76.00% 	    | 75.89% 	    | 76.00% 	    | 79.38% 	    | 81.43% 	|          	|
-| Proxy-anchor loss 	    | 78.81% 	    | 79.17% 	    | 78.70% 	    | 79.17% 	    | 82.15% 	    | 83.09% 	|          	|
-| **Soft-triple loss**  	| **79.92%** 	| **80.12%**	| **79.93%** 	| **80.12%** 	| **85.92%** 	| **85.11%** 	|          	|
+|                   	    | MAP    	    | P@1    	    | P@5    	    | Top-1  	    | Top-5  	    | NMI    	    | Download 	|
+|-------------------	    |--------	    |--------	    |--------	    |--------	    |--------	    |--------	    |----------	|
+| Triplet loss      	    | 70.26% 	    | 70.92% 	    | 70.16% 	    | 70.92% 	    | 85.73% 	    | 82.00% 	    |[Drive](https://drive.google.com/file/d/1dUX4Qs-rcTQGKUZd9vkC2obAJ3BxTCbc/view?usp=sharing)          	|
+| Proxy-NCA loss    	    | 75.90% 	    | 76.00% 	    | 75.89% 	    | 76.00% 	    | 79.38% 	    | 81.43% 	    |[Drive](https://drive.google.com/file/d/1i8r-z123USWRUD7VHDOH4M6cO73nTUJr/view?usp=sharing)           	|
+| Proxy-anchor loss 	    | 78.81% 	    | 79.17% 	    | 78.70% 	    | 79.17% 	    | 82.15% 	    | 83.09% 	    |[Drive](https://drive.google.com/file/d/15ZTm4DoyyN28k2pryeVbRyu7l7tD96XN/view?usp=sharing)          	|
+| **Soft-triple loss**  	| **79.92%** 	| **80.12%**	| **79.93%** 	| **80.12%** 	| **85.92%** 	| **85.11%** 	|[Drive](https://drive.google.com/file/d/18gcUh3ZmBAL9SwWvG6B3fHUSOGfS5vQF/view?usp=sharing)          	|
 
 
 <br>
@@ -263,15 +263,15 @@ data/
 
 ## Plot confusion matrix
 ```sh
-PYTHONPATH=./ python src/scripts/visualize_confusion_matrix.py --test_images_dir data/TshinghuaDogs/val/ --reference_images_dir data/TshinghuaDogs/train -c src/checkpoints/proxynca-resnet50.pth
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/scripts/visualize_confusion_matrix.py --test_images_dir data/TshinghuaDogs/val/ --reference_images_dir data/TshinghuaDogs/train -c src/checkpoints/proxynca-resnet50.pth
 ```
 ## Plot T-SNE
 ```sh
-PYTHONPATH=./ python src/scripts/visualize_tsne.py --images_dir data/TshinghuaDogs/val/ -c src/checkpoints/proxynca-resnet50.pth
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/scripts/visualize_tsne.py --images_dir data/TshinghuaDogs/val/ -c src/checkpoints/proxynca-resnet50.pth
 ```
 ## Plot similarity matrix
 ```sh
-PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/TshinghuaDogs/val/ -c src/checkpoints/proxynca-resnet50.pth
+CUDA_VISIBLE_DEVICES=0 PYTHONPATH=./ python src/scripts/visualize_similarity.py  --images_dir data/TshinghuaDogs/val/ -c src/checkpoints/proxynca-resnet50.pth
 ```
 
 For more detail about arguments in each script, run
