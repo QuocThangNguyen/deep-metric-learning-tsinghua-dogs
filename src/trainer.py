@@ -5,9 +5,9 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 import logging
-from typing import Tuple, Dict, Any
+from typing import Tuple, Dict, Any, Union
 
-from src.losses import TripletMarginLoss
+from src.losses import TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss, SoftTripleLoss
 from src.utils import save_checkpoint
 from src.evaluate import calculate_all_metrics
 
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 def train_one_epoch(model: nn.Module,
                     optimizer: Optimizer,
-                    loss_function: TripletMarginLoss,
+                    loss_function: Union[TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss, SoftTripleLoss],
                     train_loader: DataLoader,
                     test_loader: DataLoader,
                     reference_loader: DataLoader,
@@ -106,7 +106,7 @@ def train_one_epoch(model: nn.Module,
 
 def train_one_batch(model: nn.Module,
                     optimizer: Optimizer,
-                    loss_function: TripletMarginLoss,
+                    loss_function: Union[TripletMarginLoss, ProxyNCALoss, ProxyAnchorLoss, SoftTripleLoss],
                     images: torch.Tensor,
                     labels: torch.Tensor,
                     device: torch.device,
